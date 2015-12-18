@@ -11,7 +11,9 @@
 	- Bordure => intérieur
 
 - Différents algorithmes :
-	- 
+	- tabu search
+	- backtrack
+- 
 
 ## Notation du projet
 - La cotation du projet se fait sur le nombre de bords de pièces qui matchent.
