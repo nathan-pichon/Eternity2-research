@@ -7,6 +7,10 @@
 - Chaque pièce peut être tournée
 
 - Différentes méthodes de résolution du puzzle ont déjà été exploités :
+	- Equerre => Triangle => Carré
+	- Bordure => intérieur
+
+- Différents algorithmes :
 	- 
 
 ## Notation du projet
