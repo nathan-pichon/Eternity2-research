@@ -69,6 +69,17 @@ class Board:
             + " " + str(self.board[i+12].piece) + " " + str(self.board[i+13].piece) + " " + str(self.board[i+14].piece)+ " " + str(self.board[i+15].piece) + "\n"
             i+=16
 
+    def toString(self):
+        i = 0
+        mystr = ""
+        while i < len(self.board):
+            mystr = str(self.board[i].piece) + " " + str(self.board[i+1].piece) + " " + str(self.board[i+2].piece) + " " + str(self.board[i+3].piece) + " " + str(self.board[i+4].piece) + " " + str(self.board[i+5].piece) \
+            + " " + str(self.board[i+6].piece) + " " + str(self.board[i+7].piece) + " " + str(self.board[i+8].piece) + " " + str(self.board[i+9].piece) + " " + str(self.board[i+10].piece) + " " + str(self.board[i+11].piece) \
+            + " " + str(self.board[i+12].piece) + " " + str(self.board[i+13].piece) + " " + str(self.board[i+14].piece)+ " " + str(self.board[i+15].piece) + "\n"
+            i+=16
+        return mystr
+        
+
 def main():
     b = Board()
     b.printBoard()

@@ -32,15 +32,15 @@ class algorithm:
 
     def mutate(self):
 
-    def doAlgorithm(self):
+    def doOneGen(self):
         for i in self.boards:
             # crossover
-
+            self.crossover()
             # mutate
-
-
+            self.mutate()
             # substract life
             i.life -= 1
             # remove dead boards
             if (i.life == 0):
                 self.boards.remove(i)
+        self.getBest()
