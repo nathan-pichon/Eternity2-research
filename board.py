@@ -1,12 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import csv
 from piece import Piece
 
+## BOARD OF THE GAME
+## self.board is the board
+## self.note is the note of the board
 class Board:
 
+    #ctr
     def __init__(self):
         self.board = []
+        self.note = 0
+        self.life = random.randrange(7, 12)
         self.init_board()
+        self.notate()
 
     # Initialize Board with random pieces
     def init_board(self):
@@ -22,6 +32,7 @@ class Board:
             self.board.append(Piece(all_pieces[i], i))
 
     # Get Note for the board
+    # We add +1 for each faces that match
     def notate(self):
         self.note = 0
         i = 0
@@ -48,6 +59,8 @@ class Board:
                 if (random_pieces[i].faces[2] == random_pieces[i-1].faces[2]):
                     self.note += 1
             i+=1
+
+    # Helper to print board
     def printBoard(self):
         i = 0
         while i < len(self.board):
