@@ -36,8 +36,8 @@ class algorithm:
         t = second.board[num]
         second2 = copy.copy(second)
         first2 = copy.copy(first)
-        second2.life = random.range(7, 12)
-        first2.life = random.range(7, 12)
+        second2.life = random.randrange(7, 12)
+        first2.life = random.randrange(7, 12)
         second2.change(num, first.board[num])
         first2.change(num, t)
         self.boards.append(second2)
