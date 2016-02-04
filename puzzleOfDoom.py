@@ -9,6 +9,7 @@ from algorithm import algorithm
 class PuzzleOfDoom:
     def __init__(self):
         self.windown = Tk()
+        self.windown.wm_title('Puzzle Of Doom')
         self.algorithm = algorithm(4)
         self.cursorPosition = IntVar()
         self.cursorPosition.set(0)
@@ -19,42 +20,48 @@ class PuzzleOfDoom:
 
     def loadBestFrame(self):
         # Left side, show best board for the current generation
-        bestFrame = Frame(self.windown, relief=GROOVE)
+        bestFrame = LabelFrame(self.windown, text=" Best board of the generation ", padx=20, pady=20)
         bestFrame.pack(side=LEFT, padx=15, pady=15)
 
         self.canvasBestFrame = Canvas(bestFrame, width=400, height=400, background='black')
         self.canvasBestFrame.pack(side=TOP, padx=5, pady=5)
 
-        self.entree = Entry(bestFrame, textvariable=self.nbrGen, width=30)
-        self.entree.pack()
+        bottomFrame = Frame(bestFrame, relief=FLAT, borderwidth=1)
+        bottomFrame.pack(side=BOTTOM, padx=5, pady=5)
 
-        Button(bestFrame, text="Generate", command=self.doNextGen).pack(side=LEFT, padx=5, pady=5)
+        self.entree = Entry(bottomFrame, textvariable=self.nbrGen, width=10)
+        self.entree.pack(side=LEFT)
+        Button(bottomFrame, text=" Generate ", relief=RAISED, command=self.doNextGen).pack(side=LEFT, padx=5, pady=5)
 
     def loadBoardFrame(self):
         # Right side, show all boards for the current generation
-        boardsFrame = Frame(self.windown, relief=GROOVE)
+        boardsFrame = LabelFrame(self.windown, text="Boards", padx=20, pady=20)
         boardsFrame.pack(side=RIGHT, padx=15, pady=15)
 
         self.canvasBoardFrame = Canvas(boardsFrame, width=400, height=400, background='black')
         self.canvasBoardFrame.pack(side=TOP, padx=5, pady=5)
 
-        Button(boardsFrame, text="<<", command=self.PreviousBoard).pack(side=LEFT, padx=5, pady=5)
-        Label(boardsFrame, textvariable=self.cursorPosition).pack()
+        bottomFrame = Frame(boardsFrame, relief=FLAT, borderwidth=1)
+        bottomFrame.pack(side=BOTTOM, padx=5, pady=5)
+
+        Button(bottomFrame, text="<<", relief=RAISED, command=self.PreviousBoard).pack(side=LEFT, padx=5, pady=5)
+        Label(bottomFrame, textvariable=self.cursorPosition).pack(side=LEFT, padx=5, pady=5)
         self.boardCount.set(len(self.algorithm.boards) - 1)
-        Label(boardsFrame, textvariable=self.boardCount).pack()
-        Button(boardsFrame, text=">>", command=self.NextBoard).pack(side=RIGHT, padx=5, pady=5)
+        Label(bottomFrame, text='/').pack(side=LEFT, padx=5, pady=5)
+        Label(bottomFrame, textvariable=self.boardCount).pack(side=LEFT, padx=5, pady=5)
+        Button(bottomFrame, text=">>", relief=RAISED, command=self.NextBoard).pack(side=LEFT, padx=5, pady=5)
 
     # Next board button
     def NextBoard(self):
         if (self.cursorPosition.get() < len(self.algorithm.boards) - 1):
             self.cursorPosition.set(self.cursorPosition.get() + 1)
-            self.attachBoardToFrame(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Previous board button
     def PreviousBoard(self):
         if (self.cursorPosition.get() > 0):
             self.cursorPosition.set(self.cursorPosition.get() - 1)
-            self.attachBoardToFrame(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Generate new gen button
     def doNextGen(self):
@@ -67,12 +74,12 @@ class PuzzleOfDoom:
         else:
             self.algorithm.doOneGen()
         self.boardCount.set(len(self.algorithm.boards) - 1)
-        self.attachBoardToFrame(self.algorithm.best.board, self.canvasBestFrame)
+        self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
         self.cursorPosition.set(0)
-        self.attachBoardToFrame(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Attach board to frame
-    def attachBoardToFrame(self, board, canvas):
+    def attachBoardToCanvas(self, board, canvas):
         # Generate image
         im = Image.new("RGB", (400, 400))
         i = 1
@@ -80,10 +87,10 @@ class PuzzleOfDoom:
         y = 0
 
         for piece in board:
-            piece = Image.open("project/Eternity/" + str(piece.piece + 1) + '.png')
-            piece.thumbnail((25, 25), Image.ANTIALIAS)
+            pieceIm = Image.open("project/Eternity/" + str(piece.piece + 1) + '.png')
+            pieceIm.thumbnail((25, 25), Image.ANTIALIAS)
 
-            im.paste(piece, (x, y))
+            im.paste(pieceIm, (x, y))
             x += 25
             if i % 16 == 0:
                 y += 25
@@ -99,9 +106,10 @@ def main():
     puzzleOfDoom.loadBestFrame()
     puzzleOfDoom.loadBoardFrame()
 
-    puzzleOfDoom.attachBoardToFrame(puzzleOfDoom.algorithm.best.board, puzzleOfDoom.canvasBestFrame)
-    puzzleOfDoom.attachBoardToFrame(puzzleOfDoom.algorithm.boards[puzzleOfDoom.cursorPosition.get()].board, puzzleOfDoom.canvasBoardFrame)
+    puzzleOfDoom.attachBoardToCanvas(puzzleOfDoom.algorithm.best.board, puzzleOfDoom.canvasBestFrame)
+    puzzleOfDoom.attachBoardToCanvas(puzzleOfDoom.algorithm.boards[puzzleOfDoom.cursorPosition.get()].board, puzzleOfDoom.canvasBoardFrame)
 
     puzzleOfDoom.windown.mainloop()
 
-main()
+if __name__ == '__main__':
+    main()
