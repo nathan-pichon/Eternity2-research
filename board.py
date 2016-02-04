@@ -87,9 +87,9 @@ class Board:
     def printBoard(self):
         i = 0
         while i < len(self.board):
-            print str(self.board[i].piece) + " " + str(self.board[i+1].piece) + " " + str(self.board[i+2].piece) + " " + str(self.board[i+3].piece) + " " + str(self.board[i+4].piece) + " " + str(self.board[i+5].piece) \
-            + " " + str(self.board[i+6].piece) + " " + str(self.board[i+7].piece) + " " + str(self.board[i+8].piece) + " " + str(self.board[i+9].piece) + " " + str(self.board[i+10].piece) + " " + str(self.board[i+11].piece) \
-            + " " + str(self.board[i+12].piece) + " " + str(self.board[i+13].piece) + " " + str(self.board[i+14].piece)+ " " + str(self.board[i+15].piece)
+            print str(self.board[i].piece) + "\t" + str(self.board[i+1].piece) + "\t" + str(self.board[i+2].piece) + "\t" + str(self.board[i+3].piece) + "\t" + str(self.board[i+4].piece) + "\t" + str(self.board[i+5].piece) \
+            + "\t" + str(self.board[i+6].piece) + "\t" + str(self.board[i+7].piece) + "\t" + str(self.board[i+8].piece) + "\t" + str(self.board[i+9].piece) + "\t" + str(self.board[i+10].piece) + "\t" + str(self.board[i+11].piece) \
+            + "\t" + str(self.board[i+12].piece) + "\t" + str(self.board[i+13].piece) + "\t" + str(self.board[i+14].piece)+ "\t" + str(self.board[i+15].piece)
             i+=16
 
     def toString(self):

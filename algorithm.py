@@ -97,9 +97,3 @@ class algorithm:
             if (i.life == 0):
                 self.boards.remove(i)
         self.getBest()
-
-def main():
-    a = algorithm(4)
-    for i in range(0, 100):
-        a.doOneGen()
-main()
