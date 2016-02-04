@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from Tkinter import *
+from tkMessageBox import *
 from PIL import ImageTk, Image
 
 from algorithm import algorithm
@@ -18,6 +19,25 @@ class PuzzleOfDoom:
         self.nbrGen = IntVar()
         self.nbrGen.set(1)
 
+    def about(self):
+        showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
+
+    def loadMenu(self):
+        menubar = Menu(self.windown)
+
+        menu1 = Menu(menubar, tearoff=0)
+        menu1.add_command(label="Save")
+        menu1.add_command(label="Load")
+        menu1.add_separator()
+        menu1.add_command(label="Quit", command=self.windown.quit)
+        menubar.add_cascade(label="Fichier", menu=menu1)
+
+        menu3 = Menu(menubar, tearoff=0)
+        menu3.add_command(label="About", command=self.about)
+        menubar.add_cascade(label="Help", menu=menu3)
+
+        self.windown.config(menu=menubar)
+
     def loadBestFrame(self):
         # Left side, show best board for the current generation
         bestFrame = LabelFrame(self.windown, text=" Best board of the generation ", padx=20, pady=20)
@@ -31,11 +51,11 @@ class PuzzleOfDoom:
 
         self.entree = Entry(bottomFrame, textvariable=self.nbrGen, width=10)
         self.entree.pack(side=LEFT)
-        Button(bottomFrame, text=" Generate ", relief=RAISED, command=self.doNextGen).pack(side=LEFT, padx=5, pady=5)
+        Button(bottomFrame, text="Generate", relief=RAISED, command=self.doNextGen).pack(side=LEFT, padx=5, pady=5)
 
     def loadBoardFrame(self):
         # Right side, show all boards for the current generation
-        boardsFrame = LabelFrame(self.windown, text="Boards", padx=20, pady=20)
+        boardsFrame = LabelFrame(self.windown, text=" Boards ", padx=20, pady=20)
         boardsFrame.pack(side=RIGHT, padx=15, pady=15)
 
         self.canvasBoardFrame = Canvas(boardsFrame, width=400, height=400, background='black')
@@ -105,6 +125,7 @@ def main():
 
     puzzleOfDoom.loadBestFrame()
     puzzleOfDoom.loadBoardFrame()
+    puzzleOfDoom.loadMenu()
 
     puzzleOfDoom.attachBoardToCanvas(puzzleOfDoom.algorithm.best.board, puzzleOfDoom.canvasBestFrame)
     puzzleOfDoom.attachBoardToCanvas(puzzleOfDoom.algorithm.boards[puzzleOfDoom.cursorPosition.get()].board, puzzleOfDoom.canvasBoardFrame)
