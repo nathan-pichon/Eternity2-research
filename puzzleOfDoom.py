@@ -20,15 +20,12 @@ class PuzzleOfDoom:
         self.nbrGen = IntVar()
         self.nbrGen.set(1)
 
-    def about(self):
-        showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
-
     def loadMenu(self):
         menubar = Menu(self.windown)
 
         menu1 = Menu(menubar, tearoff=0)
-        menu1.add_command(label="Save")
-        menu1.add_command(label="Load")
+        menu1.add_command(label="Save", command=self.save)
+        menu1.add_command(label="Load", command=self.load)
         menu1.add_separator()
         menu1.add_command(label="Quit", command=self.windown.quit)
         menubar.add_cascade(label="Fichier", menu=menu1)
@@ -71,6 +68,15 @@ class PuzzleOfDoom:
         Label(bottomFrame, text='/').pack(side=LEFT, padx=5, pady=5)
         Label(bottomFrame, textvariable=self.boardCount).pack(side=LEFT, padx=5, pady=5)
         Button(bottomFrame, text=">>", relief=RAISED, command=self.NextBoard).pack(side=LEFT, padx=5, pady=5)
+
+    def about(self):
+        showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
+
+    def save(self):
+        print 'Save'
+
+    def load(self):
+        print 'Load'
 
     # Next board button
     def NextBoard(self):
