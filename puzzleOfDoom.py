@@ -10,6 +10,7 @@ from algorithm import algorithm
 class PuzzleOfDoom:
     def __init__(self):
         self.windown = Tk()
+        self.windown.resizable(width=FALSE, height=FALSE)
         self.windown.wm_title('Puzzle Of Doom')
         self.algorithm = algorithm(4)
         self.cursorPosition = IntVar()
