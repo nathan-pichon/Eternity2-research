@@ -10,4 +10,6 @@ import collections
 class Piece(object):
 	def __init__(self, faces, piece, orient = 0):
 		self.faces = np.append(faces, orient)
+		self.rotatedFaces = np.append(faces, orient)
 		self.piece = piece
+		self.orientation = orient

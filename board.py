@@ -8,6 +8,10 @@ from piece import Piece
 ## BOARD OF THE GAME
 ## self.board is the board
 ## self.note is the note of the board
+TOP = 0
+BOT = 1
+LEFT = 2
+RIGHT = 3
 class Board:
 
     #ctr
@@ -61,25 +65,25 @@ class Board:
         i = 0
         for i in range(len(self.board)):
             if (i > 16): #NOT TOP
-                if (self.board[i].faces[0] == self.board[i-16].faces[0]):
+                if (self.board[i].faces[TOP] == self.board[i-16].faces[BOT]):
                     self.note += 1
             else: #TOP
                 self.note += 0
             if (i < 240): #NOT BOT
-                if (self.board[i].faces[1] == self.board[i+16].faces[1]):
+                if (self.board[i].faces[BOT] == self.board[i+16].faces[TOP]):
                     self.note += 1
             else: #BOT
                 self.note += 0
             if (i % 16==0): #LEFT
-                if (self.board[i].faces[2] == self.board[i+1].faces[2]):
+                if (self.board[i].faces[RIGHT] == self.board[i+1].faces[LEFT]):
                     self.note += 1
             elif (i % 16==15): #RIGT
-                if (self.board[i].faces[3] == self.board[i-1].faces[3]):
+                if (self.board[i].faces[LEFT] == self.board[i-1].faces[RIGHT]):
                     self.note += 1
             else: #MIDDLE
-                if (self.board[i].faces[3] == self.board[i+1].faces[3]):
+                if (self.board[i].faces[RIGHT] == self.board[i+1].faces[LEFT]):
                     self.note += 1
-                if (self.board[i].faces[2] == self.board[i-1].faces[2]):
+                if (self.board[i].faces[LEFT] == self.board[i-1].faces[RIGHT]):
                     self.note += 1
             i+=1
 
