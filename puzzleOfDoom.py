@@ -127,14 +127,19 @@ class PuzzleOfDoom:
             i = self.nbrGen.get()
             while i > 0:
                 self.algorithm.doOneGen()
+                self.boardCount.set(len(self.algorithm.boards) - 1)
+                self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+                self.cursorPosition.set(0)
+                self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+                self.windown.update()
                 print i
                 i -= 1
         else:
             self.algorithm.doOneGen()
-        self.boardCount.set(len(self.algorithm.boards) - 1)
-        self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-        self.cursorPosition.set(0)
-        self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+            self.boardCount.set(len(self.algorithm.boards) - 1)
+            self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+            self.cursorPosition.set(0)
+            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Attach board to frame
     def attachBoardToCanvas(self, board, canvas):
