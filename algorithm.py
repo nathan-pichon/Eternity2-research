@@ -18,7 +18,7 @@ class algorithm:
         self.init_algo()
         self.best = self.boards[0]
         self.getBest()
-        self.genCount = 0
+        self.genCount = 1
 
     # Init algo with numberOfBoards boards in the list
     def init_algo(self):

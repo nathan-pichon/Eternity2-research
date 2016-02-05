@@ -6,13 +6,16 @@ from ttk import *
 from tkMessageBox import *
 from PIL import ImageTk, Image
 
+import tkFileDialog
+import copy
+import pickle
+
 from algorithm import algorithm
 
 class GenBackUp:
-    def __init__(self, iteration, best, boards):
-        self.iteration = iteration
-        self.best = best
-        self.boards = boards
+    def __init__(self, genCount, algorithm):
+        self.genCount = genCount
+        self.algorithm = algorithm
 
 class PuzzleOfDoom:
     def __init__(self):
@@ -43,19 +46,21 @@ class PuzzleOfDoom:
 
         # Best side
         self.genCount = IntVar()
-        self.genCount.set(0)
+        self.genCount.set(1)
 
         self.currentBestLife = IntVar()
         self.currentBestLife.set(0)
         self.currentBestNote = IntVar()
         self.currentBestNote.set(0)
 
-
     def initUI(self):
 
         for i in range(1, 256):
             self.piecesIm.append(Image.open("project/Eternity/" + str(i) + '.png'))
             self.piecesIm[i - 1].thumbnail((25, 25), Image.ANTIALIAS)
+
+        # Capture gen state
+        self.historyGen.append(GenBackUp(self.genCount.get(), copy.copy(self.algorithm)))
 
         self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
         self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
@@ -85,6 +90,7 @@ class PuzzleOfDoom:
 
         menu1 = Menu(menubar, tearoff=0)
         menu1.add_command(label="Save", command=self.save)
+        menu1.add_command(label="Load", command=self.load)
         menu1.add_separator()
         menu1.add_command(label="Quit", command=self.windown.quit)
         menubar.add_cascade(label="Fichier", menu=menu1)
@@ -142,11 +148,11 @@ class PuzzleOfDoom:
         pstats3 = Separator(pstats)
         pstats.add(pstats3)
 
-        pstats4 = Label(pstats, text='Note: ', anchor=W)
+        pstats4 = Label(pstats, text='Best Note: ', anchor=W)
         Label(pstats4, textvariable=self.currentBestNote).pack()
         pstats.add(pstats4)
 
-        pstats4 = Label(pstats, text='Life: ', anchor=W)
+        pstats4 = Label(pstats, text='Best Life: ', anchor=W)
         Label(pstats4, textvariable=self.currentBestLife).pack()
         pstats.add(pstats4)
 
@@ -209,20 +215,37 @@ class PuzzleOfDoom:
         showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
 
     def save(self):
-        print 'Save'
+        filename = tkFileDialog.asksaveasfilename(defaultextension=".pkl")
+
+        if filename:
+            with open(filename, 'wb') as output:
+                pickle.dump(self.historyGen, output, pickle.HIGHEST_PROTOCOL)
+
+    def load(self):
+        # Check if algo is on process
+        filepath = tkFileDialog.askopenfilename(title="Open history", filetypes=[('pkl files','.pkl')])
+
+        save = pickle.load(open(filepath, "rb"))
+
+        self.algorithm = save[len(save) - 1].algorithm
+        self.genCount.set(save[len(save) - 1].genCount)
+
+        self.boardCount.set(len(self.algorithm.boards) - 1)
+        self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+        self.cursorPosition.set(0)
+        self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+
 
     # Next board button
     def NextBoard(self):
         if (self.cursorPosition.get() < len(self.algorithm.boards) - 1):
             self.cursorPosition.set(self.cursorPosition.get() + 1)
-            self.algorithm.boards[self.cursorPosition.get()].printBoard()
             self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Previous board button
     def PreviousBoard(self):
         if (self.cursorPosition.get() > 0):
             self.cursorPosition.set(self.cursorPosition.get() - 1)
-            self.algorithm.boards[self.cursorPosition.get()].printBoard()
             self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Generate new gen button
@@ -232,11 +255,11 @@ class PuzzleOfDoom:
                 self.inProcess.set(self.nbrGen.get())
                 while self.inProcess.get() > 0:
                     self.algorithm.doOneGen()
+                    self.genCount.set(self.algorithm.genCount)
 
                     # Capture gen state
-                    self.historyGen.append(GenBackUp(self.genCount, self.algorithm.best, self.algorithm.boards))
+                    self.historyGen.append(GenBackUp(self.genCount.get(), copy.copy(self.algorithm)))
 
-                    self.genCount.set(self.algorithm.genCount)
                     self.boardCount.set(len(self.algorithm.boards) - 1)
                     self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
                     self.cursorPosition.set(0)
@@ -246,6 +269,11 @@ class PuzzleOfDoom:
             else:
                 self.inProcess.set(1)
                 self.algorithm.doOneGen()
+                self.genCount.set(self.algorithm.genCount)
+
+                # Capture gen state
+                self.historyGen.append(GenBackUp(self.genCount.get(), copy.copy(self.algorithm)))
+
                 self.boardCount.set(len(self.algorithm.boards) - 1)
                 self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
                 self.cursorPosition.set(0)

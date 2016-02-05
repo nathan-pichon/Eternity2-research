@@ -2,3 +2,4 @@
 algorithm.pyc
 board.pyc
 piece.pyc
+*.pkl
