@@ -8,12 +8,25 @@ from PIL import ImageTk, Image
 
 from algorithm import algorithm
 
+class GenBackUp:
+    def __init__(self, iteration, best, boards):
+        self.iteration = iteration
+        self.best = best
+        self.boards = boards
+
 class PuzzleOfDoom:
     def __init__(self):
         self.windown = Tk()
         self.windown.resizable(width=FALSE, height=FALSE)
         self.windown.wm_title('Puzzle Of Doom')
         self.algorithm = algorithm(4)
+
+        self.inProcess = IntVar()
+        self.inProcess.set(0)
+
+        self.historyGen = []
+
+        self.piecesIm = []
 
         # Board side
         self.cursorPosition = IntVar()
@@ -37,9 +50,6 @@ class PuzzleOfDoom:
         self.currentBestNote = IntVar()
         self.currentBestNote.set(0)
 
-        self.historyBestBoard = []
-
-        self.piecesIm = []
 
     def initUI(self):
 
@@ -125,12 +135,16 @@ class PuzzleOfDoom:
         Label(pstats1, textvariable=self.genCount).pack()
         pstats.add(pstats1)
 
-        pstats2 = Separator(pstats)
+        pstats2 = Label(pstats, text='In process: ', anchor=W)
+        Label(pstats2, textvariable=self.inProcess).pack()
         pstats.add(pstats2)
 
-        pstats3 = Label(pstats, text='Note: ', anchor=W)
-        Label(pstats3, textvariable=self.currentBestNote).pack()
+        pstats3 = Separator(pstats)
         pstats.add(pstats3)
+
+        pstats4 = Label(pstats, text='Note: ', anchor=W)
+        Label(pstats4, textvariable=self.currentBestNote).pack()
+        pstats.add(pstats4)
 
         pstats4 = Label(pstats, text='Life: ', anchor=W)
         Label(pstats4, textvariable=self.currentBestLife).pack()
@@ -188,47 +202,55 @@ class PuzzleOfDoom:
         Label(pstats4, textvariable=self.currentBoardLife).pack()
         pstats.add(pstats4)
 
+        pstats5 = Label(pstats, text='', anchor=W)
+        pstats.add(pstats5)
+
     def about(self):
         showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
 
     def save(self):
         print 'Save'
 
-    def load(self):
-        print 'Load'
-
     # Next board button
     def NextBoard(self):
         if (self.cursorPosition.get() < len(self.algorithm.boards) - 1):
             self.cursorPosition.set(self.cursorPosition.get() + 1)
+            self.algorithm.boards[self.cursorPosition.get()].printBoard()
             self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Previous board button
     def PreviousBoard(self):
         if (self.cursorPosition.get() > 0):
             self.cursorPosition.set(self.cursorPosition.get() - 1)
+            self.algorithm.boards[self.cursorPosition.get()].printBoard()
             self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Generate new gen button
     def doNextGen(self):
-        if (self.nbrGen.get() >= 1):
-            i = self.nbrGen.get()
-            while i > 0:
+        if self.inProcess.get() == 0:
+            if (self.nbrGen.get() >= 1):
+                self.inProcess.set(self.nbrGen.get())
+                while self.inProcess.get() > 0:
+                    self.algorithm.doOneGen()
+
+                    # Capture gen state
+                    self.historyGen.append(GenBackUp(self.genCount, self.algorithm.best, self.algorithm.boards))
+
+                    self.genCount.set(self.algorithm.genCount)
+                    self.boardCount.set(len(self.algorithm.boards) - 1)
+                    self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+                    self.cursorPosition.set(0)
+                    self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+                    self.windown.update()
+                    self.inProcess.set(self.inProcess.get() - 1)
+            else:
+                self.inProcess.set(1)
                 self.algorithm.doOneGen()
-                self.genCount.set(self.algorithm.genCount)
                 self.boardCount.set(len(self.algorithm.boards) - 1)
                 self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
                 self.cursorPosition.set(0)
                 self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
-                self.windown.update()
-                print i
-                i -= 1
-        else:
-            self.algorithm.doOneGen()
-            self.boardCount.set(len(self.algorithm.boards) - 1)
-            self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-            self.cursorPosition.set(0)
-            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+                self.inProcess.set(0)
 
     # Attach board to frame
     def attachBoardToCanvas(self, board, canvas):
