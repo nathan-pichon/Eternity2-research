@@ -18,6 +18,7 @@ class algorithm:
         self.init_algo()
         self.best = self.boards[0]
         self.getBest()
+        self.genCount = 0
 
     # Init algo with numberOfBoards boards in the list
     def init_algo(self):
@@ -80,6 +81,7 @@ class algorithm:
     # One Generation
     # Call it for each generation
     def doOneGen(self):
+        self.genCount += 1
         # crossover
 
         self.crossover()
@@ -94,6 +96,6 @@ class algorithm:
             # substract life
             i.life -= 1
             # remove dead boards
-            if (i.life == 0):
+            if (i.life <= 0):
                 self.boards.remove(i)
         self.getBest()

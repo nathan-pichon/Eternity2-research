@@ -14,12 +14,28 @@ class PuzzleOfDoom:
         self.windown.resizable(width=FALSE, height=FALSE)
         self.windown.wm_title('Puzzle Of Doom')
         self.algorithm = algorithm(4)
+
+        # Board side
         self.cursorPosition = IntVar()
         self.cursorPosition.set(0)
         self.boardCount = IntVar()
         self.boardCount.set(0)
+
         self.nbrGen = IntVar()
         self.nbrGen.set(1)
+        self.currentBoardLife = IntVar()
+        self.currentBoardLife.set(0)
+        self.currentBoardNote = IntVar()
+        self.currentBoardNote.set(0)
+
+        # Best side
+        self.genCount = IntVar()
+        self.genCount.set(0)
+
+        self.currentBestLife = IntVar()
+        self.currentBestLife.set(0)
+        self.currentBestNote = IntVar()
+        self.currentBestNote.set(0)
 
         self.historyBestBoard = []
 
@@ -43,8 +59,10 @@ class PuzzleOfDoom:
 
     def loadTabGeneration(self):
         self.tabGeneration = Frame(self.note)
+
         self.loadBestFrame()
         self.loadBoardFrame()
+
         self.loadMenu()
         self.note.add(self.tabGeneration, text="Generation")
 
@@ -72,25 +90,69 @@ class PuzzleOfDoom:
         bestFrame = LabelFrame(self.tabGeneration, text=" Best board of the generation ")
         bestFrame.pack(side=LEFT, padx=15, pady=15)
 
-        self.canvasBestFrame = Canvas(bestFrame, width=400, height=400, background='black')
+        # Panel canvas & controllers + stats
+        p = PanedWindow(bestFrame, orient=VERTICAL)
+        p.pack(side=TOP, expand=Y, fill=BOTH, pady=2, padx=2)
+
+        # Panel canvas + controllers
+        panel1 = Label(p, text='Canvas + Controllers', anchor=CENTER)
+        p.add(panel1)
+
+        # Canvas = board
+        self.canvasBestFrame = Canvas(panel1, width=400, height=400, background='black')
         self.canvasBestFrame.pack(side=TOP, padx=5, pady=5)
 
-        bottomFrame = Frame(bestFrame, relief=FLAT, borderwidth=1)
-        bottomFrame.pack(side=BOTTOM, padx=5, pady=5)
+        # Button frame
+        buttomFrame = Frame(panel1, relief=FLAT, borderwidth=1)
+        buttomFrame.pack(side=BOTTOM, padx=5, pady=5)
 
-        self.entree = Entry(bottomFrame, textvariable=self.nbrGen, width=10)
+        self.entree = Entry(buttomFrame, textvariable=self.nbrGen, width=10)
         self.entree.pack(side=LEFT)
-        Button(bottomFrame, text="Generate", command=self.doNextGen).pack(side=LEFT, padx=5, pady=5)
+        Button(buttomFrame, text="Generate", command=self.doNextGen).pack(side=LEFT, padx=5, pady=5)
+
+        # Stats
+        panel2 = Label(p, text='Statistiques', anchor=CENTER)
+        p.add(panel2)
+
+        statsFrame = LabelFrame(panel2, text=" Statistiques ")
+        statsFrame.pack(fill=X, padx=15, pady=15)
+
+        # Panel stats
+        pstats = PanedWindow(statsFrame, orient=VERTICAL)
+        pstats.pack(side=TOP, expand=Y, fill=BOTH, pady=2, padx=2)
+
+        pstats1 = Label(pstats, text='Generation n°', anchor=W)
+        Label(pstats1, textvariable=self.genCount).pack()
+        pstats.add(pstats1)
+
+        pstats2 = Separator(pstats)
+        pstats.add(pstats2)
+
+        pstats3 = Label(pstats, text='Note: ', anchor=W)
+        Label(pstats3, textvariable=self.currentBestNote).pack()
+        pstats.add(pstats3)
+
+        pstats4 = Label(pstats, text='Life: ', anchor=W)
+        Label(pstats4, textvariable=self.currentBestLife).pack()
+        pstats.add(pstats4)
 
     def loadBoardFrame(self):
         # Right side, show all boards for the current generation
         boardsFrame = LabelFrame(self.tabGeneration, text=" Boards ")
         boardsFrame.pack(side=RIGHT, padx=15, pady=15)
 
-        self.canvasBoardFrame = Canvas(boardsFrame, width=400, height=400, background='black')
+        # Panel canvas & controllers + stats
+        p = PanedWindow(boardsFrame, orient=VERTICAL)
+        p.pack(side=TOP, expand=Y, fill=BOTH, pady=2, padx=2)
+
+        # Panel canvas + controllers
+        panel1 = Label(p, text='Canvas + Controllers', anchor=CENTER)
+        p.add(panel1)
+
+        self.canvasBoardFrame = Canvas(panel1, width=400, height=400, background='black')
         self.canvasBoardFrame.pack(side=TOP, padx=5, pady=5)
 
-        bottomFrame = Frame(boardsFrame, relief=FLAT, borderwidth=1)
+        bottomFrame = Frame(panel1, relief=FLAT, borderwidth=1)
         bottomFrame.pack(side=BOTTOM, padx=5, pady=5)
 
         Button(bottomFrame, text="<<",command=self.PreviousBoard).pack(side=LEFT, padx=5, pady=5)
@@ -99,6 +161,32 @@ class PuzzleOfDoom:
         Label(bottomFrame, text='/').pack(side=LEFT, padx=5, pady=5)
         Label(bottomFrame, textvariable=self.boardCount).pack(side=LEFT, padx=5, pady=5)
         Button(bottomFrame, text=">>", command=self.NextBoard).pack(side=LEFT, padx=5, pady=5)
+
+        # Stats
+        panel2 = Label(p, text='Statistiques', anchor=CENTER)
+        p.add(panel2)
+
+        statsFrame = LabelFrame(panel2, text=" Statistiques ")
+        statsFrame.pack(fill=X, padx=15, pady=15)
+
+        # Panel stats
+        pstats = PanedWindow(statsFrame, orient=VERTICAL)
+        pstats.pack(side=TOP, expand=Y, fill=BOTH, pady=2, padx=2)
+
+        pstats1 = Label(pstats, text='Board n°', anchor=W)
+        Label(pstats1, textvariable=self.cursorPosition).pack()
+        pstats.add(pstats1)
+
+        pstats2 = Separator(pstats)
+        pstats.add(pstats2)
+
+        pstats3 = Label(pstats, text='Note: ', anchor=W)
+        Label(pstats3, textvariable=self.currentBoardNote).pack()
+        pstats.add(pstats3)
+
+        pstats4 = Label(pstats, text='Life: ', anchor=W)
+        Label(pstats4, textvariable=self.currentBoardLife).pack()
+        pstats.add(pstats4)
 
     def about(self):
         showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
@@ -127,6 +215,7 @@ class PuzzleOfDoom:
             i = self.nbrGen.get()
             while i > 0:
                 self.algorithm.doOneGen()
+                self.genCount.set(self.algorithm.genCount)
                 self.boardCount.set(len(self.algorithm.boards) - 1)
                 self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
                 self.cursorPosition.set(0)
@@ -143,6 +232,12 @@ class PuzzleOfDoom:
 
     # Attach board to frame
     def attachBoardToCanvas(self, board, canvas):
+        # Update UI val
+        self.currentBoardLife.set(self.algorithm.boards[self.cursorPosition.get()].life)
+        self.currentBoardNote.set(self.algorithm.boards[self.cursorPosition.get()].note)
+        self.currentBestLife.set(self.algorithm.best.life)
+        self.currentBestNote.set(self.algorithm.best.note)
+
         # Generate image
         im = Image.new("RGB", (400, 400))
         i = 1
