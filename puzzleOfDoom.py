@@ -56,7 +56,7 @@ class PuzzleOfDoom:
     def initUI(self):
 
         for i in range(1, 256):
-            self.piecesIm.append(Image.open("project/Eternity/" + str(i) + '.png'))
+            self.piecesIm.append(Image.open("project/Eternity_resized/" + str(i) + '.png'))
             self.piecesIm[i - 1].thumbnail((25, 25), Image.ANTIALIAS)
 
         # Capture gen state
