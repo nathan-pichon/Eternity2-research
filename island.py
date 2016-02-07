@@ -26,7 +26,7 @@ class IslandsAlgorithm(object):
 		islands_algorithms = []
 		for i in range(len(self.islands)):
 			self.islands[i].doOneGen()
-			islands_algorithms.append(self.islands[i])
+			islands_algorithms.append(copy.deepcopy(self.islands[i]))
 			if (self.generationNumber % self.turnover) == 0:
 				self.linear_migration(random.randrange(0, int(self.populationNb/2)))
 		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms))
@@ -41,9 +41,10 @@ class IslandsAlgorithm(object):
 				[self.islands[i+1].boards.append(self.islands[i].boards[idx]) for idx in toMigrateIdxs]
 			[self.islands[i].boards.pop(idx) for idx in toMigrateIdxs]
 
+
 if __name__ == '__main__':
-	gen_nb = 100
-	islands = IslandsAlgorithm(10, 4, 30)
+	gen_nb = 1000
+	islands = IslandsAlgorithm(3, 30, 20)
 	for i in range(gen_nb):
 		islands.doNextGen()
 
