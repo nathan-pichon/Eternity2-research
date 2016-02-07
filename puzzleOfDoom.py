@@ -25,10 +25,12 @@ class PuzzleOfDoom:
         self.windown.wm_title('Puzzle Of Doom')
 
         # Algorithms
-        self.algorithm = algorithm(4)
-        
         self.useIsland = False
-        self.islands = IslandsAlgorithm(10, 4, 25)
+        if self.useIsland:
+            self.islands = IslandsAlgorithm(10, 4, 25)
+        else:
+            self.algorithm = algorithm(4)
+
 
         self.inProcess = IntVar()
         self.inProcess.set(0)
@@ -66,10 +68,13 @@ class PuzzleOfDoom:
             self.piecesIm[i - 1].thumbnail((25, 25), Image.ANTIALIAS)
 
         # Capture gen state
-        self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
-
-        self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-        self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        if not self.useIsland:
+            self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
+            self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        else:
+            self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
+            self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     def loadUI(self):
         self.note = Notebook(self.windown)
@@ -183,7 +188,10 @@ class PuzzleOfDoom:
 
         Button(bottomFrame, text="<<",command=self.PreviousBoard).pack(side=LEFT, padx=5, pady=5)
         Label(bottomFrame, textvariable=self.cursorPosition).pack(side=LEFT, padx=5, pady=5)
-        self.boardCount.set(len(self.algorithm.boards) - 1)
+        if self.useIsland:
+            self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
+        else:
+            self.boardCount.set(len(self.algorithm.boards) - 1)
         Label(bottomFrame, text='/').pack(side=LEFT, padx=5, pady=5)
         Label(bottomFrame, textvariable=self.boardCount).pack(side=LEFT, padx=5, pady=5)
         Button(bottomFrame, text=">>", command=self.NextBoard).pack(side=LEFT, padx=5, pady=5)
@@ -225,7 +233,10 @@ class PuzzleOfDoom:
 
         if filename:
             with open(filename, 'wb') as output:
-                pickle.dump(self.historyGen, output, pickle.HIGHEST_PROTOCOL)
+                if self.useIsland:
+                    pickle.dump(self.islands.generationHistory, output, pickle.HIGHEST_PROTOCOL)
+                else:
+                    pickle.dump(self.historyGen, output, pickle.HIGHEST_PROTOCOL)
 
     def load(self):
         # Check if algo is on process
@@ -233,26 +244,46 @@ class PuzzleOfDoom:
 
         save = pickle.load(open(filepath, "rb"))
 
-        self.algorithm = save[len(save) - 1].algorithm
-        self.genCount.set(save[len(save) - 1].genCount)
-
-        self.boardCount.set(len(self.algorithm.boards) - 1)
-        self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-        self.cursorPosition.set(0)
-        self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        if self.useIsland:
+            self.islands = IslandsAlgorithm(len(save[len(save)-1].algorithms), save[len(save)-1].populationNb, save[len(save)-1].turnover)
+            self.genCount.set(save[len(save)-1].genCount)
+            self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
+            self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
+            self.cursorPosition.set(0)
+            self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        else:
+            self.algorithm = save[len(save) - 1].algorithm
+            self.genCount.set(save[len(save) - 1].genCount)
+            self.boardCount.set(len(self.algorithm.boards) - 1)
+            self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+            self.cursorPosition.set(0)
+            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
 
     # Next board button
     def NextBoard(self):
-        if (self.cursorPosition.get() < len(self.algorithm.boards) - 1):
-            self.cursorPosition.set(self.cursorPosition.get() + 1)
-            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        if self.useIsland:
+            if self.cursorPosition.get() < (self.islands.islandNumber*self.islands.populationNb):
+                self.cursorPosition.set(self.cursorPosition.get() + 1)
+                islandIdx = int((self.cursorPosition.get())/self.islands.populationNb)
+                boardIdx = int(str(self.cursorPosition.get())[-1])-1%self.islands.populationNb
+                print "{} --- {}".format(islandIdx, boardIdx)
+                self.attachBoardToCanvas(self.islands.islands[islandIdx].boards[boardIdx].board, self.canvasBoardFrame)
+        else:
+            if (self.cursorPosition.get() < len(self.algorithm.boards) - 1):
+                self.cursorPosition.set(self.cursorPosition.get() + 1)
+                self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Previous board button
     def PreviousBoard(self):
-        if (self.cursorPosition.get() > 0):
-            self.cursorPosition.set(self.cursorPosition.get() - 1)
-            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        if self.useIsland:
+            if (self.cursorPosition.get() > 0):
+                self.cursorPosition.set(self.cursorPosition.get() - 1)
+                self.attachBoardToCanvas(self.islands.islands[int(self.cursorPosition.get()/10)].boards[int(str(self.cursorPosition.get())[-1])%4].board, self.canvasBoardFrame)
+        else:
+            if (self.cursorPosition.get() > 0):
+                self.cursorPosition.set(self.cursorPosition.get() - 1)
+                self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Generate new gen button
     def doNextGen(self):
@@ -301,10 +332,16 @@ class PuzzleOfDoom:
     # Attach board to frame
     def attachBoardToCanvas(self, board, canvas):
         # Update UI val
-        self.currentBoardLife.set(self.algorithm.boards[self.cursorPosition.get()].life)
-        self.currentBoardNote.set(self.algorithm.boards[self.cursorPosition.get()].note)
-        self.currentBestLife.set(self.algorithm.best.life)
-        self.currentBestNote.set(self.algorithm.best.note)
+        if self.useIsland:
+            self.currentBoardLife.set(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].life)
+            self.currentBoardNote.set(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].note)
+            self.currentBestLife.set(self.islands.best.life)
+            self.currentBestNote.set(self.islands.best.note)
+        else:
+            self.currentBoardLife.set(self.algorithm.boards[self.cursorPosition.get()].life)
+            self.currentBoardNote.set(self.algorithm.boards[self.cursorPosition.get()].note)
+            self.currentBestLife.set(self.algorithm.best.life)
+            self.currentBestNote.set(self.algorithm.best.note)
 
         # Generate image
         im = Image.new("RGB", (400, 400))

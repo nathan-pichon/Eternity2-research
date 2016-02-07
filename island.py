@@ -7,19 +7,22 @@ import random
 from algorithm import algorithm
 
 class IslandGenBackup:
-	def __init__(self, genCount, algorithms):
+	def __init__(self, genCount, algorithms, migrationsTurnover, populationNb):
 		self.genCount = genCount
 		self.algorithms = algorithms
+		self.populationNb = populationNb
+		self.turnover = migrationsTurnover
 
 class IslandsAlgorithm(object):
 	def __init__(self, islandNb, populationNb, migrationsTurnover):
 		self.generationNumber = 0
 		self.generationHistory = []
 
-		self.islandNumber = islandNb
 		self.populationNb = populationNb
 		self.turnover = migrationsTurnover
+
 		self.islands = self.initIsland(islandNb, populationNb)
+		self.islandNumber = len(self.islands)
 
 		self.best = self.islands[0].best
 
@@ -34,7 +37,7 @@ class IslandsAlgorithm(object):
 			islands_algorithms.append(copy.deepcopy(self.islands[i]))
 			if (self.generationNumber % self.turnover) == 0:
 				self._linearMigration(random.randrange(0, int(self.populationNb/2)))
-		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms))
+		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb))
 		self.generationNumber += 1
 		self.getBest()
 
