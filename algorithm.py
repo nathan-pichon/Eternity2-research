@@ -42,7 +42,7 @@ class algorithm:
         second2.change(num, first.board[num])
         first2.change(num, t)
         self.boards.append(second2)
-        self.boards.append(first)
+        self.boards.append(first2)
 
     # crossover
     # we cross half population with a wheel selection
@@ -95,6 +95,7 @@ class algorithm:
         for i in self.boards:
             # substract life
             i.life -= 1
+            print "life = " + str(i.life)
             # remove dead boards
             if (i.life <= 0):
                 self.boards.remove(i)
