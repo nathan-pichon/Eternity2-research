@@ -60,7 +60,7 @@ class PuzzleOfDoom:
             self.piecesIm[i - 1].thumbnail((25, 25), Image.ANTIALIAS)
 
         # Capture gen state
-        self.historyGen.append(GenBackUp(self.genCount.get(), copy.copy(self.algorithm)))
+        self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
 
         self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
         self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
@@ -258,7 +258,7 @@ class PuzzleOfDoom:
                     self.genCount.set(self.algorithm.genCount)
 
                     # Capture gen state
-                    self.historyGen.append(GenBackUp(self.genCount.get(), copy.copy(self.algorithm)))
+                    self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
 
                     self.boardCount.set(len(self.algorithm.boards) - 1)
                     self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
@@ -272,7 +272,7 @@ class PuzzleOfDoom:
                 self.genCount.set(self.algorithm.genCount)
 
                 # Capture gen state
-                self.historyGen.append(GenBackUp(self.genCount.get(), copy.copy(self.algorithm)))
+                self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
 
                 self.boardCount.set(len(self.algorithm.boards) - 1)
                 self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
