@@ -11,6 +11,7 @@ import copy
 import pickle
 
 from algorithm import algorithm
+from island import IslandsAlgorithm
 
 class GenBackUp:
     def __init__(self, genCount, algorithm):
@@ -22,7 +23,12 @@ class PuzzleOfDoom:
         self.windown = Tk()
         self.windown.resizable(width=FALSE, height=FALSE)
         self.windown.wm_title('Puzzle Of Doom')
+
+        # Algorithms
         self.algorithm = algorithm(4)
+        
+        self.useIsland = False
+        self.islands = IslandsAlgorithm(10, 4, 25)
 
         self.inProcess = IntVar()
         self.inProcess.set(0)
@@ -254,30 +260,42 @@ class PuzzleOfDoom:
             if (self.nbrGen.get() >= 1):
                 self.inProcess.set(self.nbrGen.get())
                 while self.inProcess.get() > 0:
-                    self.algorithm.doOneGen()
-                    self.genCount.set(self.algorithm.genCount)
-
-                    # Capture gen state
-                    self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
-
-                    self.boardCount.set(len(self.algorithm.boards) - 1)
-                    self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-                    self.cursorPosition.set(0)
-                    self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+                    if self.useIsland:
+                        self.islands.doOneGen()
+                        self.genCount.set(self.islands.generationNumber)
+                        self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
+                        self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
+                        self.cursorPosition.set(0)
+                        self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+                    else:
+                        self.algorithm.doOneGen()
+                        self.genCount.set(self.algorithm.genCount)
+                        # Capture gen state
+                        self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
+                        self.boardCount.set(len(self.algorithm.boards) - 1)
+                        self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+                        self.cursorPosition.set(0)
+                        self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
                     self.windown.update()
                     self.inProcess.set(self.inProcess.get() - 1)
             else:
                 self.inProcess.set(1)
-                self.algorithm.doOneGen()
-                self.genCount.set(self.algorithm.genCount)
-
-                # Capture gen state
-                self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
-
-                self.boardCount.set(len(self.algorithm.boards) - 1)
-                self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-                self.cursorPosition.set(0)
-                self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+                if self.useIsland:
+                    self.islands.doOneGen()
+                    self.genCount.set(self.islands.generationNumber)
+                    self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
+                    self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
+                    self.cursorPosition.set(0)
+                    self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+                else:
+                    self.algorithm.doOneGen()
+                    self.genCount.set(self.algorithm.genCount)
+                    # Capture gen state
+                    self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
+                    self.boardCount.set(len(self.algorithm.boards) - 1)
+                    self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+                    self.cursorPosition.set(0)
+                    self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
                 self.inProcess.set(0)
 
     # Attach board to frame
