@@ -109,17 +109,12 @@ class PuzzleOfDoom:
         os.makedirs(self.mainFolder + '/data/')
         os.makedirs(self.mainFolder + '/logs/')
 
-        # Log fist gen
         self.logger.init()
-
-        # Simple log
-        self.logger.writeBestBoardCSV([self.genCount.get()] + self.algorithm.best.toArray())
-        self.logger.writeGenerationCSV({'time': datetime.now().time(), 'generation': self.genCount.get(), 'note': self.algorithm.best.note})
-
-        # Island log
-        #
-
         if not self.useIsland:
+            # Simple log
+            self.logger.writeBestBoardCSV([self.genCount.get()] + self.algorithm.best.toArray())
+            self.logger.writeGenerationCSV({'time': datetime.now().time(), 'generation': self.genCount.get(), 'note': self.algorithm.best.note})
+
             # Save gen data
             dataSaved = GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm));
             dataSaved.save(self.mainFolder);
@@ -129,6 +124,9 @@ class PuzzleOfDoom:
             self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
             self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
         else:
+            # Island log
+            #
+
             # Save gen data
             #
             #
