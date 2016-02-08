@@ -77,7 +77,6 @@ class algorithm:
         n = random.randrange(0, len(self.boards)-1)
         self.boards[n].mutate(random.randrange(0, 16*16-1))
 
-
     # One Generation
     # Call it for each generation
     def doOneGen(self):

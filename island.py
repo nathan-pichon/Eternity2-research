@@ -59,8 +59,6 @@ class IslandsAlgorithm(object):
 				print "Migrate ({}) from island {} to island {}".format(toMigrateIdxs, i, i+1)
 			self.islands[i].boards = [item for j, item in enumerate(self.islands[i].boards) if j not in toMigrateIdxs]
 
-
-
 	def _randomizeMigration(self):
 		prev_migrations = []
 		for i in range(len(self.islands)):
@@ -76,7 +74,6 @@ class IslandsAlgorithm(object):
 		for i in range(len(self.islands)):
 			if self.islands[i].best.note > self.best.note:
 				self.best = self.islands[i].best
-
 
 if __name__ == '__main__':
 	gen_nb = 100
