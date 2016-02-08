@@ -4,3 +4,4 @@ board.pyc
 piece.pyc
 *.pkl
 *.pyc
+results/

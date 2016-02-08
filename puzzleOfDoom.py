@@ -10,10 +10,34 @@ import tkFileDialog
 import copy
 import os
 import pickle
+import csv
 from datetime import datetime
 
 from algorithm import algorithm
 from island import IslandsAlgorithm
+
+class LoggerCSV:
+    def __init__(self, mainFolder):
+        self.logsFolder = mainFolder + '/logs/'
+
+    def init(self):
+        # Log files
+        self.generationCSV = open(self.logsFolder + 'generation.csv', 'a+')
+        self.bestBoardCSV = open(self.logsFolder + 'bestBoard.csv', 'a+')
+
+        # Writer with header
+        fieldnamesGen = ['time', 'generation', 'note']
+        self.generationWriter = csv.DictWriter(self.generationCSV, fieldnames=fieldnamesGen)
+        self.generationWriter.writeheader()
+
+        # Writer without header
+        self.bestBoardWriter = csv.writer(self.bestBoardCSV)
+
+    def writeGenerationCSV(self, data):
+        self.generationWriter.writerow(data)
+
+    def writeBestBoardCSV(self, data):
+        self.bestBoardWriter.writerow(data)
 
 class GenBackUp:
     def __init__(self, genCount, data):
@@ -45,6 +69,9 @@ class PuzzleOfDoom:
         self.mainFolder = os.getcwd() + '/results/' + time.strftime('run-%Y-%m-%d_%H-%M-%S')
         self.sizeHistory = 25
         self.historyGen = []
+
+        # Logger
+        self.logger = LoggerCSV(self.mainFolder)
 
         # Board side
         self.cursorPosition = IntVar()
@@ -81,6 +108,16 @@ class PuzzleOfDoom:
         os.makedirs(self.mainFolder)
         os.makedirs(self.mainFolder + '/data/')
         os.makedirs(self.mainFolder + '/logs/')
+
+        # Log fist gen
+        self.logger.init()
+
+        # Simple log
+        self.logger.writeBestBoardCSV([self.genCount.get()] + self.algorithm.best.toArray())
+        self.logger.writeGenerationCSV({'time': datetime.now().time(), 'generation': self.genCount.get(), 'note': self.algorithm.best.note})
+
+        # Island log
+        #
 
         if not self.useIsland:
             # Save gen data
@@ -319,6 +356,10 @@ class PuzzleOfDoom:
                         self.islands.doOneGen()
                         self.genCount.set(self.islands.generationNumber)
 
+                        # Island log
+                        #
+                        #
+
                         # Save gen data
                         #
                         #
@@ -332,6 +373,10 @@ class PuzzleOfDoom:
                     else:
                         self.algorithm.doOneGen()
                         self.genCount.set(self.algorithm.genCount)
+
+                        # Simple log
+                        self.logger.writeBestBoardCSV([self.genCount.get()] + self.algorithm.best.toArray())
+                        self.logger.writeGenerationCSV({'time': datetime.now().time(), 'generation': self.genCount.get(), 'note': self.algorithm.best.note})
 
                         # Save gen data
                         dataSaved = GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm));

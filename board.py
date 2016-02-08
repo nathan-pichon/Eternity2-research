@@ -105,3 +105,26 @@ class Board:
             + " " + str(self.board[i+12].piece) + " " + str(self.board[i+13].piece) + " " + str(self.board[i+14].piece)+ " " + str(self.board[i+15].piece) + "\n"
             i+=16
         return mystr
+    
+    def toArray(self):
+        i = 0
+        array = []
+        while i < len(self.board):
+            array.append(self.board[i].piece)
+            array.append(self.board[i+1].piece)
+            array.append(self.board[i+2].piece)
+            array.append(self.board[i+3].piece)
+            array.append(self.board[i+4].piece)
+            array.append(self.board[i+5].piece)
+            array.append(self.board[i+6].piece)
+            array.append(self.board[i+7].piece)
+            array.append(self.board[i+8].piece)
+            array.append(self.board[i+9].piece)
+            array.append(self.board[i+10].piece)
+            array.append(self.board[i+11].piece)
+            array.append(self.board[i+12].piece)
+            array.append(self.board[i+13].piece)
+            array.append(self.board[i+14].piece)
+            array.append(self.board[i+15].piece)
+            i+=16
+        return array
