@@ -36,19 +36,41 @@ class IslandsAlgorithm(object):
 			self.islands[i].doOneGen()
 			islands_algorithms.append(copy.deepcopy(self.islands[i]))
 			if (self.generationNumber % self.turnover) == 0:
+				# self._randomizeMigration()
 				self._linearMigration(random.randrange(0, int(self.populationNb/2)))
 		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb))
 		self.generationNumber += 1
 		self.getBest()
 
+	def getRandom(self, limits, exclude=[]):
+		randInt = random.randint(limits[0], limits[1])
+		if randInt in exclude:
+			self.getRandom(limits, exclude)
+		return randInt
+
 	def _linearMigration(self, toMigrateNb=1):
 		for i in range(len(self.islands)):
-			toMigrateIdxs = [random.randrange(0, self.populationNb-1) for j in range(toMigrateNb)]
+			toMigrateIdxs = [self.getRandom((0, len(self.islands[i].boards)-1)) for j in range(toMigrateNb)]
 			if i == len(self.islands)-1:
 				[self.islands[0].boards.append(self.islands[i].boards[idx]) for idx in toMigrateIdxs]
+				print "Migrate ({}) from island {} to island {}".format(toMigrateIdxs, i, 0)
 			else:
 				[self.islands[i+1].boards.append(self.islands[i].boards[idx]) for idx in toMigrateIdxs]
-			[self.islands[i].boards.pop(idx) for idx in toMigrateIdxs]
+				print "Migrate ({}) from island {} to island {}".format(toMigrateIdxs, i, i+1)
+			self.islands[i].boards = [item for j, item in enumerate(self.islands[i].boards) if j not in toMigrateIdxs]
+
+
+
+	def _randomizeMigration(self):
+		prev_migrations = []
+		for i in range(len(self.islands)):
+			toMigrateIdxs = list(set([self.getRandom((0, len(self.islands[i].boards)-1)) for j in range(self.getRandom((0, len(self.islands[i].boards)-2)))]))
+			toExclude = prev_migrations + [i]
+			toMigrateIslandIdx = self.getRandom((0, len(self.islands)-1), toExclude)
+			prev_migrations.append(toMigrateIslandIdx)
+			[self.islands[toMigrateIslandIdx].boards.append(self.islands[i].boards[idx]) for idx in toMigrateIdxs]
+			print "Migrate ({}) from island {} to island {}".format(toMigrateIdxs, i, toMigrateIslandIdx)
+			self.islands[i].boards = [item for j, item in enumerate(self.islands[i].boards) if j not in toMigrateIdxs]
 
 	def getBest(self):
 		for i in range(len(self.islands)):
@@ -57,8 +79,8 @@ class IslandsAlgorithm(object):
 
 
 if __name__ == '__main__':
-	gen_nb = 1000
-	islands = IslandsAlgorithm(3, 30, 20)
+	gen_nb = 100
+	islands = IslandsAlgorithm(10, 20, 10)
 	for i in range(gen_nb):
 		islands.doOneGen()
 
@@ -69,11 +91,4 @@ if __name__ == '__main__':
 			for e in range(len(islands.generationHistory[i].algorithms[j].boards)):
 				if max_note == None or max_note < islands.generationHistory[i].algorithms[j].boards[e].note:
 					max_note = islands.generationHistory[i].algorithms[j].boards[e].note
-				# print "Generation {} -- Ile {} -- Board {} -- Note {} -- Life {}".format(i, 
-				# 															 		     j,
-				# 															   			 e,
-				# 															   			 islands.generationHistory[i].algorithms[j].boards[e].note,
-				# 															   			 islands.generationHistory[i].algorithms[j].boards[e].life
-				# 															  			)
-
 	print "Le meilleur score est : {}".format(max_note)
