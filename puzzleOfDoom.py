@@ -63,9 +63,9 @@ class PuzzleOfDoom:
 
     def initUI(self):
 
-        for i in range(1, 256):
-            self.piecesIm.append(Image.open("project/Eternity_resized/" + str(i) + '.png'))
-            self.piecesIm[i - 1].thumbnail((25, 25), Image.ANTIALIAS)
+        for i in range(0, 256):
+            self.piecesIm.append(Image.open("project/Eternity_resized/" + str(i + 1) + '.png'))
+            self.piecesIm[i].thumbnail((25, 25), Image.ANTIALIAS)
 
         # Capture gen state
         if not self.useIsland:
@@ -350,7 +350,7 @@ class PuzzleOfDoom:
         y = 0
 
         for piece in board:
-            im.paste(self.piecesIm[piece.piece - 1].rotate(piece.orientation), (x, y))
+            im.paste(self.piecesIm[piece.piece].rotate(piece.orientation), (x, y))
             x += 25
             if i % 16 == 0:
                 y += 25
