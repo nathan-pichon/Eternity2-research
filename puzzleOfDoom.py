@@ -8,21 +8,30 @@ from PIL import ImageTk, Image
 
 import tkFileDialog
 import copy
+import os
 import pickle
+from datetime import datetime
 
 from algorithm import algorithm
 from island import IslandsAlgorithm
 
 class GenBackUp:
-    def __init__(self, genCount, algorithm):
+    def __init__(self, genCount, data):
         self.genCount = genCount
-        self.algorithm = algorithm
+        self.data = data
+
+    def save(self, mainFolder):
+        with open(mainFolder + '/data/generation_' + str(self.genCount) + '.pkl', 'wb') as output:
+            pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
 class PuzzleOfDoom:
     def __init__(self):
         self.windown = Tk()
         self.windown.resizable(width=FALSE, height=FALSE)
         self.windown.wm_title('Puzzle Of Doom')
+        self.piecesIm = []
+        self.inProcess = IntVar()
+        self.inProcess.set(0)
 
         # Algorithms
         self.useIsland = False
@@ -31,13 +40,11 @@ class PuzzleOfDoom:
         else:
             self.algorithm = algorithm(4)
 
-
-        self.inProcess = IntVar()
-        self.inProcess.set(0)
-
+        # Backup
+        time = datetime.now()
+        self.mainFolder = os.getcwd() + '/results/' + time.strftime('run-%Y-%m-%d_%H-%M-%S')
+        self.sizeHistory = 25
         self.historyGen = []
-
-        self.piecesIm = []
 
         # Board side
         self.cursorPosition = IntVar()
@@ -63,16 +70,34 @@ class PuzzleOfDoom:
 
     def initUI(self):
 
+        # Preload images
         for i in range(0, 256):
-            self.piecesIm.append(Image.open("project/Eternity_resized/" + str(i + 1) + '.png'))
+            im = Image.open("project/Eternity_resized/" + str(i + 1) + '.png')
+            self.piecesIm.append(im.copy())
+            im.close()
             self.piecesIm[i].thumbnail((25, 25), Image.ANTIALIAS)
 
-        # Capture gen state
+        # Create results folders
+        os.makedirs(self.mainFolder)
+        os.makedirs(self.mainFolder + '/data/')
+        os.makedirs(self.mainFolder + '/logs/')
+
         if not self.useIsland:
-            self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
+            # Save gen data
+            dataSaved = GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm));
+            dataSaved.save(self.mainFolder);
+            #self.historyGen.append(dataSaved);
+
+            # Attach board to UI canvas
             self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
             self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
         else:
+            # Save gen data
+            #
+            #
+            #
+
+            # Attach board to UI canvas
             self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
             self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
@@ -100,7 +125,7 @@ class PuzzleOfDoom:
         menubar = Menu(self.windown)
 
         menu1 = Menu(menubar, tearoff=0)
-        menu1.add_command(label="Save", command=self.save)
+        #menu1.add_command(label="Save", command=self.save)
         menu1.add_command(label="Load", command=self.load)
         menu1.add_separator()
         menu1.add_command(label="Quit", command=self.windown.quit)
@@ -228,15 +253,15 @@ class PuzzleOfDoom:
     def about(self):
         showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
 
-    def save(self):
-        filename = tkFileDialog.asksaveasfilename(defaultextension=".pkl")
+    #def save(self):
+    #    filename = tkFileDialog.asksaveasfilename(defaultextension=".pkl")
 
-        if filename:
-            with open(filename, 'wb') as output:
-                if self.useIsland:
-                    pickle.dump(self.islands.generationHistory, output, pickle.HIGHEST_PROTOCOL)
-                else:
-                    pickle.dump(self.historyGen, output, pickle.HIGHEST_PROTOCOL)
+    #    if filename:
+    #        with open(filename, 'wb') as output:
+    #            if self.useIsland:
+    #                pickle.dump(self.islands.generationHistory, output, pickle.HIGHEST_PROTOCOL)
+    #            else:
+    #                pickle.dump(self.historyGen, output, pickle.HIGHEST_PROTOCOL)
 
     def load(self):
         # Check if algo is on process
@@ -244,21 +269,20 @@ class PuzzleOfDoom:
 
         save = pickle.load(open(filepath, "rb"))
 
-        if self.useIsland:
-            self.islands = IslandsAlgorithm(len(save[len(save)-1].algorithms), save[len(save)-1].populationNb, save[len(save)-1].turnover)
-            self.genCount.set(save[len(save)-1].genCount)
-            self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
-            self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
-            self.cursorPosition.set(0)
-            self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
-        else:
-            self.algorithm = save[len(save) - 1].algorithm
-            self.genCount.set(save[len(save) - 1].genCount)
-            self.boardCount.set(len(self.algorithm.boards) - 1)
-            self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-            self.cursorPosition.set(0)
-            self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
-
+        #if self.useIsland:
+        #    self.islands = IslandsAlgorithm(len(save[len(save)-1].algorithms), save[len(save)-1].populationNb, save[len(save)-1].turnover)
+        #    self.genCount.set(save[len(save)-1].genCount)
+        #    self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
+        #    self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
+        #    self.cursorPosition.set(0)
+        #    self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+        #else:
+        self.algorithm = save.data
+        self.genCount.set(save.genCount)
+        self.boardCount.set(len(self.algorithm.boards) - 1)
+        self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
+        self.cursorPosition.set(0)
+        self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     # Next board button
     def NextBoard(self):
@@ -294,6 +318,13 @@ class PuzzleOfDoom:
                     if self.useIsland:
                         self.islands.doOneGen()
                         self.genCount.set(self.islands.generationNumber)
+
+                        # Save gen data
+                        #
+                        #
+                        #
+
+                        # Attach board to UI canvas
                         self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
                         self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
                         self.cursorPosition.set(0)
@@ -301,33 +332,19 @@ class PuzzleOfDoom:
                     else:
                         self.algorithm.doOneGen()
                         self.genCount.set(self.algorithm.genCount)
-                        # Capture gen state
-                        self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
+
+                        # Save gen data
+                        dataSaved = GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm));
+                        dataSaved.save(self.mainFolder);
+                        #self.historyGen.append(dataSaved);
+
+                        # Attach board to UI canvas
                         self.boardCount.set(len(self.algorithm.boards) - 1)
                         self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
                         self.cursorPosition.set(0)
                         self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
                     self.windown.update()
                     self.inProcess.set(self.inProcess.get() - 1)
-            else:
-                self.inProcess.set(1)
-                if self.useIsland:
-                    self.islands.doOneGen()
-                    self.genCount.set(self.islands.generationNumber)
-                    self.boardCount.set(self.islands.islandNumber*self.islands.populationNb)
-                    self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
-                    self.cursorPosition.set(0)
-                    self.attachBoardToCanvas(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
-                else:
-                    self.algorithm.doOneGen()
-                    self.genCount.set(self.algorithm.genCount)
-                    # Capture gen state
-                    self.historyGen.append(GenBackUp(self.genCount.get(), copy.deepcopy(self.algorithm)))
-                    self.boardCount.set(len(self.algorithm.boards) - 1)
-                    self.attachBoardToCanvas(self.algorithm.best.board, self.canvasBestFrame)
-                    self.cursorPosition.set(0)
-                    self.attachBoardToCanvas(self.algorithm.boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
-                self.inProcess.set(0)
 
     # Attach board to frame
     def attachBoardToCanvas(self, board, canvas):
