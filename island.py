@@ -1,17 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import time
 import copy
 import random
+import pickle
 
 from algorithm import algorithm
 
 class IslandGenBackup:
-	def __init__(self, genCount, algorithms, migrationsTurnover, populationNb):
+	def __init__(self, genCount, algorithms, migrationsTurnover, populationNb, boardsNb, bestBoard):
 		self.genCount = genCount
 		self.algorithms = algorithms
 		self.populationNb = populationNb
 		self.turnover = migrationsTurnover
+
+		self.boardsNumber = boardsNb
+		self.best = bestBoard
+
+	def save(self, folder):
+		with open(folder + '/data/generation_' + str(self.genCount) + '.pkl', 'wb') as output:
+			pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
 class IslandsAlgorithm(object):
 	def __init__(self, islandNb, populationNb, migrationsTurnover):
@@ -26,6 +36,8 @@ class IslandsAlgorithm(object):
 
 		self.best = self.islands[0].best
 
+		self.mainFolder = os.getcwd() + '/results/' + time.strftime('run-%Y-%m-%d_%H-%M-%S')
+
 
 	def initIsland(self, islandNb, populationNb):
 		return [algorithm(populationNb) for i in range(islandNb)]
@@ -38,9 +50,10 @@ class IslandsAlgorithm(object):
 			if (self.generationNumber % self.turnover) == 0:
 				# self._randomizeMigration()
 				self._linearMigration(random.randrange(0, int(self.populationNb/2)))
-		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb))
-		self.generationNumber += 1
 		self.getBest()
+		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb, self.getBoardsNumber(), self.best))
+		self.generationHistory[self.generationNumber].save(self.mainFolder)
+		self.generationNumber += 1
 
 	def getRandom(self, limits, exclude=[]):
 		randInt = random.randint(limits[0], limits[1])
@@ -74,6 +87,12 @@ class IslandsAlgorithm(object):
 		for i in range(len(self.islands)):
 			if self.islands[i].best.note > self.best.note:
 				self.best = self.islands[i].best
+
+	def getBoardsNumber(self):
+		boardsNumber = 0
+		for island in self.islands:
+			boardsNumber += len(island.boards)
+		return boardsNumber
 
 if __name__ == '__main__':
 	gen_nb = 100
