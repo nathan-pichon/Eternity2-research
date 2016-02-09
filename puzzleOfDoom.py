@@ -81,6 +81,8 @@ class PuzzleOfDoom:
         self.cursorIslandPosition.set(0)
         self.islandsCount = IntVar()
         self.islandsCount.set(len(self.islands.islands)-1)
+        self.islandsTotalBoard = IntVar()
+        self.islandsTotalBoard.set(0)
 
         self.cursorPosition = IntVar()
         self.cursorPosition.set(0)
@@ -298,6 +300,13 @@ class PuzzleOfDoom:
         Label(pstats1, textvariable=self.cursorPosition).pack()
         pstats.add(pstats1)
 
+        pstats6 = Label(pstats, text='Total boards number', anchor=W)
+        if self.useIsland.get() == 0:
+            Label(pstats6, textvariable=self.boardCount).pack()
+        elif self.useIsland.get() == 1:
+            Label(pstats6, textvariable=self.islandsTotalBoard).pack()
+        pstats.add(pstats6)
+
         pstats2 = Separator(pstats)
         pstats.add(pstats2)
 
@@ -348,12 +357,14 @@ class PuzzleOfDoom:
 
     def NextIsland(self):
         if self.cursorIslandPosition.get() < len(self.islands.islands) - 1:
+            self.cursorPosition.set(0)
             self.cursorIslandPosition.set(self.cursorIslandPosition.get()+1)
             self.boardCount.set(len(self.islands.islands[self.cursorIslandPosition.get()].boards)-1)
             self.attachBoardToCanvas(self.islands.islands[self.cursorIslandPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
 
     def PreviousIsland(self):
         if self.cursorIslandPosition.get() > 0:
+            self.cursorPosition.set(0)
             self.cursorIslandPosition.set(self.cursorIslandPosition.get()-1)
             self.boardCount.set(len(self.islands.islands[self.cursorIslandPosition.get()].boards)-1)
             self.attachBoardToCanvas(self.islands.islands[self.cursorIslandPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
@@ -399,6 +410,8 @@ class PuzzleOfDoom:
                         self.attachBoardToCanvas(self.islands.best.board, self.canvasBestFrame)
                         self.cursorPosition.set(0)
                         self.attachBoardToCanvas(self.islands.islands[self.cursorIslandPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
+
+                        self.islandsTotalBoard.set(self.islands.getBoardsNumber())
                     elif self.useIsland.get() == 0:
                         self.algorithm.doOneGen()
                         self.genCount.set(self.algorithm.genCount)
@@ -424,8 +437,8 @@ class PuzzleOfDoom:
     def attachBoardToCanvas(self, board, canvas):
         # Update UI val
         if self.useIsland.get() == 1:
-            self.currentBoardLife.set(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].life)
-            self.currentBoardNote.set(self.islands.islands[self.cursorPosition.get()].boards[self.cursorPosition.get()].note)
+            self.currentBoardLife.set(self.islands.islands[self.cursorIslandPosition.get()].boards[self.cursorPosition.get()].life)
+            self.currentBoardNote.set(self.islands.islands[self.cursorIslandPosition.get()].boards[self.cursorPosition.get()].note)
             self.currentBestLife.set(self.islands.best.life)
             self.currentBestNote.set(self.islands.best.note)
         elif self.useIsland.get() == 0:
