@@ -35,7 +35,9 @@ class LoggerCSV:
         self.bestBoardWriter = csv.writer(self.bestBoardCSV)
 
         # islandsMogrationsWriter
-        self.islandsMigrationsWriter = csv.writer(self.islandsMigrationsCSV)
+        islandsMigrationsFieldNames = ['time', 'generation', 'from', 'to', 'migrated_boards_idx']
+        self.islandsMigrationsWriter = csv.DictWriter(self.islandsMigrationsCSV, fieldnames=islandsMigrationsFieldNames)
+        self.islandsMigrationsWriter.writeheader()
 
     def writeGenerationCSV(self, data):
         self.generationWriter.writerow(data)
@@ -43,8 +45,9 @@ class LoggerCSV:
     def writeBestBoardCSV(self, data):
         self.bestBoardWriter.writerow(data)
 
-    def writeIslandsMigrationsCSV(self, data):
-        self.islandsMogrationsWriter.writerow(data)
+    def writeIslandsMigrationsCSV(self, datas):
+        for data in datas:
+            self.islandsMigrationsWriter.writerow(data)
 
 class GenBackUp:
     def __init__(self, genCount, data):
@@ -427,6 +430,8 @@ class PuzzleOfDoom:
                         # Simple log
                         self.logger.writeBestBoardCSV([self.genCount.get()] + self.islands.best.toArray())
                         self.logger.writeGenerationCSV({'time': datetime.now().time(), 'generation': self.genCount.get(), 'note': self.islands.best.note})
+                        if len(self.islands.migrations) > 0:
+                            self.logger.writeIslandsMigrationsCSV(self.islands.migrations)
 
                         # Attach board to UI canvas
                         self.boardCount.set(len(self.islands.islands[self.cursorIslandPosition.get()].boards)-1)
