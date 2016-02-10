@@ -25,7 +25,7 @@ class IslandGenBackup:
 			pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
 class IslandsAlgorithm(object):
-	def __init__(self, islandNb, populationNb, migrationsTurnover):
+	def __init__(self, islandNb, populationNb, migrationsTurnover, saveFolder):
 		self.generationNumber = 0
 		self.generationHistory = []
 
@@ -37,7 +37,7 @@ class IslandsAlgorithm(object):
 
 		self.best = self.islands[0].best
 
-		self.mainFolder = os.getcwd() + '/results/' + time.strftime('run-%Y-%m-%d_%H-%M-%S')
+		self.mainFolder = saveFolder
 
 		self.migrations = []
 
@@ -56,8 +56,8 @@ class IslandsAlgorithm(object):
 			self._randomizeMigration()
 			# self._linearMigration(random.randrange(0, int(self.populationNb/2)))
 		self.getBest()
-		# self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb, self.getBoardsNumber(), self.best))
-		# self.generationHistory[self.generationNumber].save(self.mainFolder)
+		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb, self.getBoardsNumber(), self.best))
+		self.generationHistory[self.generationNumber].save(self.mainFolder)
 		self.generationNumber += 1
 
 	def getRandom(self, limits, exclude=[]):
@@ -101,18 +101,3 @@ class IslandsAlgorithm(object):
 		for island in self.islands:
 			boardsNumber += len(island.boards)
 		return boardsNumber
-
-if __name__ == '__main__':
-	gen_nb = 100
-	islands = IslandsAlgorithm(10, 20, 10)
-	for i in range(gen_nb):
-		islands.doOneGen()
-
-	max_note = None
-
-	for i in range(gen_nb):
-		for j in range(len(islands.generationHistory[i].algorithms)):
-			for e in range(len(islands.generationHistory[i].algorithms[j].boards)):
-				if max_note == None or max_note < islands.generationHistory[i].algorithms[j].boards[e].note:
-					max_note = islands.generationHistory[i].algorithms[j].boards[e].note
-	print "Le meilleur score est : {}".format(max_note)

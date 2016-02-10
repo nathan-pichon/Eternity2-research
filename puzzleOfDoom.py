@@ -79,17 +79,19 @@ class PuzzleOfDoom:
         self.islandsTurnover = IntVar()
         self.islandsTurnover.set(5)
 
-        # Algorithms
-        self.islands = IslandsAlgorithm(self.islandsNb.get(),
-                                        self.initialPopulation.get(),
-                                        self.islandsTurnover.get())
-        self.algorithm = algorithm(4)
-
         # Backup
         time = datetime.now()
         self.mainFolder = os.getcwd() + '/results/' + time.strftime('run-%Y-%m-%d_%H-%M-%S')
         self.sizeHistory = 25
         self.historyGen = []
+
+        # Algorithms
+        self.islands = IslandsAlgorithm(self.islandsNb.get(),
+                                        self.initialPopulation.get(),
+                                        self.islandsTurnover.get(),
+                                        self.mainFolder)
+        self.algorithm = algorithm(4)
+
 
         # Logger
         self.logger = LoggerCSV(self.mainFolder)
@@ -423,7 +425,7 @@ class PuzzleOfDoom:
     # Next board button
     def NextBoard(self):
         if self.useIsland.get() == 1:
-            if self.cursorPosition.get() < (len(self.islands.islands[self.cursorIslandPosition.get()-1].boards)-1):
+            if self.cursorPosition.get() < (len(self.islands.islands[self.cursorIslandPosition.get()].boards)-1):
                 self.cursorPosition.set(self.cursorPosition.get() + 1)
                 self.attachBoardToCanvas(self.islands.islands[self.cursorIslandPosition.get()].boards[self.cursorPosition.get()].board, self.canvasBoardFrame)
         elif self.useIsland.get() == 0:
@@ -452,7 +454,8 @@ class PuzzleOfDoom:
         if self.useIsland.get() == 1:
             self.islands = IslandsAlgorithm(self.islandsNb.get(),
                                         self.initialPopulation.get(),
-                                        self.islandsTurnover.get())
+                                        self.islandsTurnover.get(),
+                                        self.mainFolder)
 
         if self.inProcess.get() == 0:
             if (self.nbrGen.get() >= 1):
