@@ -67,14 +67,22 @@ class PuzzleOfDoom:
         self.inProcess = IntVar()
         self.inProcess.set(0)
 
+        # Main configurations
         self.initialPopulation = IntVar()
         self.initialPopulation.set(4)
 
+        # Islands configurations
         self.useIsland = IntVar()
         self.useIsland.set(1)
+        self.islandsNb = IntVar()
+        self.islandsNb.set(10)
+        self.islandsTurnover = IntVar()
+        self.islandsTurnover.set(5)
 
         # Algorithms
-        self.islands = IslandsAlgorithm(10, 4, 25)
+        self.islands = IslandsAlgorithm(self.islandsNb.get(),
+                                        self.initialPopulation.get(),
+                                        self.islandsTurnover.get())
         self.algorithm = algorithm(4)
 
         # Backup
@@ -204,19 +212,41 @@ class PuzzleOfDoom:
         self.canvasBestFrame = Canvas(panel1, width=400, height=400, background='black')
         self.canvasBestFrame.pack(side=TOP, padx=5, pady=5)
 
-        # Button frame
-        buttomFrame = Frame(panel1, relief=FLAT, borderwidth=1)
-        buttomFrame.pack(side=BOTTOM, padx=5, pady=5)
+        # Genarations
+        generationPanel = Label(p, anchor=CENTER)
+        p.add(generationPanel)
 
-        # self.initialPopEntree = Entry(buttomFrame, text='initial pop', textvariable=self.initialPopulation, width=5)
-        # self.initialPopEntree.pack(side=LEFT)
+        generationFrame = LabelFrame(generationPanel, text=" Generations ")
+        generationFrame.pack(fill=X, padx=15, pady=15)
 
-        self.genEntree = Entry(buttomFrame, textvariable=self.nbrGen, width=10)
-        self.genEntree.pack(side=LEFT, padx=5, pady=5)
-        Button(buttomFrame, text="Generate", command=self.doNextGen).pack(side=LEFT, padx=5, pady=5)
+        genEntree = Entry(generationFrame, textvariable=self.nbrGen, width=10).pack(side=LEFT, padx=5, pady=5)
+        Button(generationFrame, text="Generate", command=self.doNextGen).pack(side=RIGHT, pady=5, padx=5)
 
-        self.useIslandButton = Checkbutton(buttomFrame, text="use islands", variable=self.useIsland)
-        self.useIslandButton.pack(side=LEFT, padx=5, pady=5)
+
+        # Main Configurations
+        mainConfigurationPanel = Label(p, anchor=CENTER)
+        p.add(mainConfigurationPanel)
+
+        configurationFrame = LabelFrame(mainConfigurationPanel, text=" Main configurations ")
+        configurationFrame.pack(fill=X, padx=15, pady=15)
+
+        initialPopEntree = Entry(configurationFrame, textvariable=self.initialPopulation, width=5).pack(side=RIGHT, pady=5, padx=5)
+        Label(configurationFrame, text="Initial population").pack(side=LEFT, padx=5, pady=5)
+
+        # Island Configurations
+        islandsConfigurationsPanel = Label(p, anchor=CENTER)
+        p.add(islandsConfigurationsPanel)
+
+        islandsConfigurationsFrame = LabelFrame(islandsConfigurationsPanel, text=" Islands configurations ")
+        islandsConfigurationsFrame.pack(fill=X, padx=15, pady=15)
+        Separator().pack(side=BOTTOM)
+        islandNbEntry = Entry(islandsConfigurationsFrame, textvariable=self.islandsNb, width=5).pack(side=LEFT, pady=5, padx=5)
+        Label(islandsConfigurationsFrame, text="Island number").pack(side=LEFT, padx=5, pady=5)
+
+        islandTurnoverEntry = Entry(islandsConfigurationsFrame, textvariable=self.islandsTurnover, width=5).pack(side=RIGHT, pady=5, padx=5)
+        Label(islandsConfigurationsFrame, text="Island turnover").pack(side=RIGHT, padx=5, pady=5)
+
+        useIslandButton = Checkbutton(islandsConfigurationsFrame, text="Use islands", variable=self.useIsland).pack(side=BOTTOM, padx=5, pady=5)
 
         # Stats
         panel2 = Label(p, text='Statistiques', anchor=CENTER)
@@ -418,6 +448,11 @@ class PuzzleOfDoom:
             self.disableFrameContent(self.bottomIslandFrame)
         elif self.useIsland.get() == 1:
             self.enableFrameContent(self.bottomIslandFrame)
+
+        if self.useIsland.get() == 1:
+            self.islands = IslandsAlgorithm(self.islandsNb.get(),
+                                        self.initialPopulation.get(),
+                                        self.islandsTurnover.get())
 
         if self.inProcess.get() == 0:
             if (self.nbrGen.get() >= 1):
