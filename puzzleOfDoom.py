@@ -24,6 +24,7 @@ class LoggerCSV:
         # Log files
         self.generationCSV = open(self.logsFolder + 'generation.csv', 'a+')
         self.bestBoardCSV = open(self.logsFolder + 'bestBoard.csv', 'a+')
+        self.islandsMigrationsCSV = open(self.logsFolder + 'islandsMigrations.csv', 'a+')
 
         # Writer with header
         fieldnamesGen = ['time', 'generation', 'note']
@@ -33,11 +34,17 @@ class LoggerCSV:
         # Writer without header
         self.bestBoardWriter = csv.writer(self.bestBoardCSV)
 
+        # islandsMogrationsWriter
+        self.islandsMigrationsWriter = csv.writer(self.islandsMigrationsCSV)
+
     def writeGenerationCSV(self, data):
         self.generationWriter.writerow(data)
 
     def writeBestBoardCSV(self, data):
         self.bestBoardWriter.writerow(data)
+
+    def writeIslandsMigrationsCSV(self, data):
+        self.islandsMogrationsWriter.writerow(data)
 
 class GenBackUp:
     def __init__(self, genCount, data):
@@ -270,16 +277,19 @@ class PuzzleOfDoom:
         Button(bottomFrame, text=">>", command=self.NextBoard).pack(side=LEFT, padx=5, pady=5)
 
 
-        bottomIslandFrame = Frame(panel1, relief=FLAT, borderwidth=1)
-        bottomIslandFrame.pack(side=BOTTOM, padx=5, pady=5)
+        self.bottomIslandFrame = Frame(panel1, relief=FLAT, borderwidth=1)
+        self.bottomIslandFrame.pack(side=BOTTOM, padx=5, pady=5)
 
-        Button(bottomIslandFrame, text="<<",command=self.PreviousIsland).pack(side=LEFT, padx=5, pady=5)
-        Label(bottomIslandFrame, textvariable=self.cursorIslandPosition).pack(side=LEFT, padx=5, pady=5)
+        Button(self.bottomIslandFrame, text="<<",command=self.PreviousIsland).pack(side=LEFT, padx=5, pady=5)
+        Label(self.bottomIslandFrame, textvariable=self.cursorIslandPosition).pack(side=LEFT, padx=5, pady=5)
 
 
-        Label(bottomIslandFrame, text='/').pack(side=LEFT, padx=5, pady=5)
-        Label(bottomIslandFrame, textvariable=self.islandsCount).pack(side=LEFT, padx=5, pady=5)
-        Button(bottomIslandFrame, text=">>", command=self.NextIsland).pack(side=LEFT, padx=5, pady=5)
+        Label(self.bottomIslandFrame, text='/').pack(side=LEFT, padx=5, pady=5)
+        Label(self.bottomIslandFrame, textvariable=self.islandsCount).pack(side=LEFT, padx=5, pady=5)
+        Button(self.bottomIslandFrame, text=">>", command=self.NextIsland).pack(side=LEFT, padx=5, pady=5)
+
+        if self.useIsland.get() == 0:
+            self.disableFrameContent(self.bottomIslandFrame)
 
         # Stats
         panel2 = Label(p, text='Statistiques', anchor=CENTER)
@@ -320,6 +330,14 @@ class PuzzleOfDoom:
 
         pstats5 = Label(pstats, text='', anchor=W)
         pstats.add(pstats5)
+
+    def disableFrameContent(self, frame):
+        for child in frame.winfo_children():
+            child.configure(state='disable')
+
+    def enableFrameContent(self, frame):
+        for child in frame.winfo_children():
+            child.configure(state='enable')
 
     def about(self):
         showinfo("About", "Puzzle Of Doom - 2016, Epitech Project by:\n\nNathan Pichonwalchshofer\tpichon_b\nThibaut Coutard\t\tcoutar_t\nAurelien Dorey\t\tdorey_a\nArthur Leclerc\t\tlecler_h")
@@ -393,6 +411,11 @@ class PuzzleOfDoom:
 
     # Generate new gen button
     def doNextGen(self):
+        if self.useIsland.get() == 0:
+            self.disableFrameContent(self.bottomIslandFrame)
+        elif self.useIsland.get() == 1:
+            self.enableFrameContent(self.bottomIslandFrame)
+
         if self.inProcess.get() == 0:
             if (self.nbrGen.get() >= 1):
                 self.inProcess.set(self.nbrGen.get())
