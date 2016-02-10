@@ -56,8 +56,8 @@ class IslandsAlgorithm(object):
 			self._randomizeMigration()
 			# self._linearMigration(random.randrange(0, int(self.populationNb/2)))
 		self.getBest()
-		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb, self.getBoardsNumber(), self.best))
-		self.generationHistory[self.generationNumber].save(self.mainFolder)
+		# self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb, self.getBoardsNumber(), self.best))
+		# self.generationHistory[self.generationNumber].save(self.mainFolder)
 		self.generationNumber += 1
 
 	def getRandom(self, limits, exclude=[]):
