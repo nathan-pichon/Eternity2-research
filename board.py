@@ -27,9 +27,11 @@ class Board:
 
     # Initialize Board with random pieces
     def init_board(self):
+        all_pieces = []
+        corner_counter = 0        
+        board = [0 for i in range(16*16)]
         random_pieces = np.arange(16*16)
         np.random.shuffle(random_pieces)
-        all_pieces = []
         with open('project/e2pieces.txt', 'rb') as csvFile:
             e2pieces = csv.reader(csvFile, delimiter=';', quotechar='|')
             for row in e2pieces:
@@ -37,6 +39,55 @@ class Board:
                     all_pieces.append(np.asarray(row).astype(int))
         for i in random_pieces:
             self.board.append(Piece(all_pieces[i], i))
+
+        # print(len(self._get_exclude(16)))
+
+        # for i in range(len(all_pieces)):
+        #     if list(all_pieces[i]).count(BORDER) == 2:
+        #         if corner_counter == 0:
+        #             board[0] = Piece(all_pieces[i], i)
+        #         elif corner_counter == 1:
+        #             board[15] = Piece(all_pieces[i], i)
+        #         elif corner_counter == 2:
+        #             board[240] = Piece(all_pieces[i], i)
+        #         elif corner_counter == 3:
+        #             board[255] = Piece(all_pieces[i], i)
+        #     elif list(all_pieces[i]).count(BORDER) == 1:
+        #         board[self._get_first_border_free(board)] = Piece(all_pieces[i], i)
+        #     else:
+        #         print(self._get_randomize_free_place(board))
+        #         board[self._get_randomize_free_place(board)] = Piece(all_pieces[i], i)
+        # print(board)
+
+    def _get_first_border_free(self, board):
+        exclude = [0,15,240,255]
+        for i in range(len(board)):
+            if (i < 16 and board[i] == BORDER) and i not in exclude:
+                return i
+            elif i%16 == 0 and board[i] == BORDER:
+                return i
+            elif i%16 == 15 and board[i] == BORDER:
+                return i
+            elif (i > 239 and board[i] == BORDER) and i not in exclude:
+                return i
+        return None
+
+    def _get_exclude(self, size):
+        exclude = [i for i in range(size)]
+        exclude += [i for i in range((size*(size-1)), ((size*size)-1))]
+        exclude += [i for i in range(16, (size*(size-1)), 16)]
+        exclude += [i for i in range((size*2)-1, ((size*size)-1), 16)]
+        return exclude
+
+    def _get_randomize_free_place(self, board):
+        rand = random.randrange(0, 16*16)
+        if not rand in self._get_exclude(16):
+            if board[rand] == 0:
+                return rand
+            else:
+                self._get_randomize_free_place(board)
+        else:
+            self._get_randomize_free_place(board)
 
 
     # Mutate the element mut to a random mutated2
