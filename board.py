@@ -12,6 +12,9 @@ TOP = 0
 BOT = 1
 LEFT = 2
 RIGHT = 3
+
+BORDER = 0
+
 class Board:
 
     #ctr
@@ -68,17 +71,23 @@ class Board:
                 if (self.board[i].faces[TOP] == self.board[i-16].faces[BOT]):
                     self.note += 1
             else: #TOP
-                self.note += 0
+                if self.board[i].faces[TOP] == BORDER:
+                    self.note += 1
             if (i < 240): #NOT BOT
                 if (self.board[i].faces[BOT] == self.board[i+16].faces[TOP]):
                     self.note += 1
             else: #BOT
-                self.note += 0
+                if self.board[i].faces[BOT] == BORDER:
+                    self.note += 1
             if (i % 16==0): #LEFT
                 if (self.board[i].faces[RIGHT] == self.board[i+1].faces[LEFT]):
                     self.note += 1
+                elif self.board[i].faces[LEFT] == BORDER:
+                    self.note += 1
             elif (i % 16==15): #RIGT
                 if (self.board[i].faces[LEFT] == self.board[i-1].faces[RIGHT]):
+                    self.note += 1
+                elif self.board[i].faces[RIGHT] == BORDER:
                     self.note += 1
             else: #MIDDLE
                 if (self.board[i].faces[RIGHT] == self.board[i+1].faces[LEFT]):
