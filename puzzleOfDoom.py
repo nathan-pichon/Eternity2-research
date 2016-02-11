@@ -241,9 +241,9 @@ class PuzzleOfDoom:
 
         islandsConfigurationsFrame = LabelFrame(islandsConfigurationsPanel, text=" Islands configurations ")
         islandsConfigurationsFrame.pack(fill=X, padx=15, pady=15)
-        Separator().pack(side=BOTTOM)
         islandNbEntry = Entry(islandsConfigurationsFrame, textvariable=self.islandsNb, width=5).pack(side=LEFT, pady=5, padx=5)
         Label(islandsConfigurationsFrame, text="Island number").pack(side=LEFT, padx=5, pady=5)
+
 
         islandTurnoverEntry = Entry(islandsConfigurationsFrame, textvariable=self.islandsTurnover, width=5).pack(side=RIGHT, pady=5, padx=5)
         Label(islandsConfigurationsFrame, text="Island turnover").pack(side=RIGHT, padx=5, pady=5)
@@ -456,6 +456,7 @@ class PuzzleOfDoom:
                                         self.initialPopulation.get(),
                                         self.islandsTurnover.get(),
                                         self.mainFolder)
+            self.islandsCount.set(self.islandsNb.get())
 
         if self.inProcess.get() == 0:
             if (self.nbrGen.get() >= 1):

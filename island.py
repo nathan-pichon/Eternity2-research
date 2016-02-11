@@ -53,8 +53,8 @@ class IslandsAlgorithm(object):
 			islands_algorithms.append(copy.deepcopy(self.islands[i]))
 
 		if (self.generationNumber % self.turnover) == 0:
-			self._randomizeMigration()
-			# self._linearMigration(random.randrange(0, int(self.populationNb/2)))
+			# self._randomizeMigration()
+			self._linearMigration(random.randrange(0, int(self.populationNb/2)))
 		self.getBest()
 		self.generationHistory.append(IslandGenBackup(self.generationNumber, islands_algorithms, self.turnover, self.populationNb, self.getBoardsNumber(), self.best))
 		self.generationHistory[self.generationNumber].save(self.mainFolder)
